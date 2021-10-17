@@ -12,15 +12,18 @@
 
 #include "FastLED.h"          // библиотека для работы с лентой
 
-#define LED_COUNT 8          // число светодиодов в кольце/ленте 8 или 12
+#define LED_COUNT 12          // число светодиодов в кольце/ленте 8 или 12
 
-// ESP
-//#define LED_DT 2
-//#define BUTTON_PIN 4
-
+#ifdef __AVR__
 // pro micro
 #define LED_DT 10
 #define BUTTON_PIN 2
+#else
+// ESP
+#define LED_DT 2
+#define BUTTON_PIN 4
+#endif
+
 
 #ifdef BUTTON_PIN
 #include "GyverButton.h"
@@ -100,7 +103,8 @@ void change_mode(int newmode);
 
 void setup()
 {
-  Serial.begin(9600);              // открыть порт для связи
+  Serial.begin(115200);                                        // Initialize serial port for debugging.
+  delay(1000);                                                // Soft startup to ease the flow of electrons.
   // погасить светодиоды rx и tx на stm32
   //  pinMode(LED_BUILTIN_TX, INPUT);
   //  pinMode(LED_BUILTIN_RX, INPUT);
