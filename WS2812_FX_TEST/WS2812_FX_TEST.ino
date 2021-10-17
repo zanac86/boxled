@@ -13,16 +13,19 @@
 #include "FastLED.h"          // библиотека для работы с лентой
 
 #define LED_COUNT 8          // число светодиодов в кольце/ленте 8 или 12
-// на pro micro с разъемом микро usb - 10
-// на pro micro, которая к елочке припаяна - 6
-// на esp  - D4
-#define LED_DT 10             // пин, куда подключен DIN ленты
-//#define LED_DT 2             // пин, куда подключен DIN ленты
 
+// ESP
+//#define LED_DT 2
+//#define BUTTON_PIN 4
+
+// pro micro
+#define LED_DT 10
 #define BUTTON_PIN 2
 
+#ifdef BUTTON_PIN
 #include "GyverButton.h"
 GButton touch(BUTTON_PIN, LOW_PULL, NORM_OPEN);
+#endif
 
 uint8_t bright_max_count = 3;
 uint8_t brights[] = {10, 100, 250};
@@ -147,8 +150,9 @@ uint8_t nextMode(uint8_t oldMode, bool useRandom)
 }
 
 void loop() {
-
+#ifdef BUTTON_PIN
   touch.tick();
+#endif
   if (millis() - last_change > change_time) {
     change_time = random(10000, 30000);               // получаем новое случайное время до следующей смены режима
     //    change_time = 20000;
@@ -160,6 +164,7 @@ void loop() {
     Serial.println(">");
   } else
   {
+#ifdef BUTTON_PIN
     if (touch.hasClicks()) {
       byte clicks = touch.getClicks();
       switch (clicks)
@@ -191,16 +196,8 @@ void loop() {
           break;
       }
     }
+#endif
   }
-
-
-
-  /*
-    if (Serial.available() > 0) {     // если что то прислали
-      ledMode = Serial.parseInt();    // парсим в тип данных int
-      change_mode(ledMode);           // меняем режим через change_mode (там для каждого режима стоят цвета и задержки)
-    }
-  */
   switch (ledMode) {
     case 999: break;                           // пазуа
     case  2: rainbow_fade(); break;            // плавная смена цветов всей ленты
